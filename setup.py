@@ -11,5 +11,5 @@ setup(name='ccmi',
       author='Sudipto Mukherjee',
       author_email='sudipm@uw.edu',
       url='https://github.com/sudiptodip15/CCMI',
-      packages=['CIT'],
+      packages=['ccmi'],
       install_requires=required)
