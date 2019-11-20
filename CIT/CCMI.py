@@ -1,8 +1,8 @@
 import numpy as np
 import tensorflow as tf
 import random
-from Neural_MINE import Neural_MINE
-from Classifier_MI import Classifier_MI
+from .Neural_MINE import Neural_MINE
+from .Classifier_MI import Classifier_MI
 
 
 class CCMI(object):

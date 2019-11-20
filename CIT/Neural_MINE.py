@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.layers as tcl
-from cit_util import *
+from .cit_util import *
 
 class Neural_MINE(object):
 
