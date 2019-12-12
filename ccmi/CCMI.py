@@ -38,79 +38,37 @@ class CCMI(object):
         return data_new
 
     def get_cmi_est(self):
+        print('Tester = {}, metric = {}'.format(self.tester, self.metric))
+        I_xyz = self.get_mi_est(self.data_xyz)
+        I_xz = self.get_mi_est(self.data_xz)
 
-        if self.tester == 'Neural':
-            print('Tester = {}, metric = {}'.format(self.tester, self.metric))
-            if self.metric == 'donsker_varadhan':
-                batch_size = 512
-            else:
-                batch_size = 128
-            I_xyz_list = []
-            for t in range(self.num_boot_iter):
-                tf.reset_default_graph()
-                data_t = self.gen_bootstrap(self.data_xyz)
-                data_xyz_train, data_xyz_eval = self.split_train_test(data_t)
-                neurMINE_xyz = Neural_MINE(data_xyz_train, data_xyz_eval, self.dim_x,
-                                           metric= self.metric, batch_size = batch_size)
-                I_xyz_t, _ = neurMINE_xyz.train()
-                I_xyz_list.append(I_xyz_t)
-
-            I_xyz_list = np.array(I_xyz_list)
-            I_xyz = np.mean(I_xyz_list)
-
-            I_xz_list = []
-            for i in range(self.num_boot_iter):
-                tf.reset_default_graph()
-                data_t = self.gen_bootstrap(self.data_xz)
-                data_xz_train, data_xz_eval = self.split_train_test(data_t)
-                neurMINE_xz = Neural_MINE(data_xz_train, data_xz_eval, self.dim_x,
-                                          metric= self.metric, batch_size = batch_size)
-                I_xz_t, _ = neurMINE_xz.train()
-                I_xz_list.append(I_xz_t)
-
-            I_xz_list = np.array(I_xz_list)
-            I_xz = np.mean(I_xz_list)
-            cmi_est = I_xyz - I_xz
-
-        elif self.tester == 'Classifier':
-            print('Tester = {}, metric = {}'.format(self.tester, self.metric))
-            I_xyz_list = []
-            for t in range(self.num_boot_iter):
-                tf.reset_default_graph()
-                data_t = self.gen_bootstrap(self.data_xyz)
-                data_xyz_train, data_xyz_eval = self.split_train_test(data_t)
-                classMINE_xyz = Classifier_MI(data_xyz_train, data_xyz_eval, self.dim_x,
-                                              h_dim = self.h_dim, max_ep = self.max_ep)
-                I_xyz_t = classMINE_xyz.train_classifier_MLP()
-                I_xyz_list.append(I_xyz_t)
-
-            I_xyz_list = np.array(I_xyz_list)
-            I_xyz = np.mean(I_xyz_list)
-
-            I_xz_list = []
-            for i in range(self.num_boot_iter):
-                tf.reset_default_graph()
-                data_t = self.gen_bootstrap(self.data_xz)
-                data_xz_train, data_xz_eval = self.split_train_test(data_t)
-                classMINE_xz = Classifier_MI(data_xz_train, data_xz_eval, self.dim_x,
-                                              h_dim = self.h_dim, max_ep = self.max_ep)
-                I_xz_t = classMINE_xz.train_classifier_MLP()
-                I_xz_list.append(I_xz_t)
-
-            I_xz_list = np.array(I_xz_list)
-            I_xz = np.mean(I_xz_list)
-            cmi_est = I_xyz - I_xz
-        else:
-            raise NotImplementedError
+        cmi_est = I_xyz - I_xz
 
         return cmi_est
 
+    def get_mi_est(self, data):
+        I_list = []
+        for t in range(self.num_boot_iter):
+            tf.reset_default_graph()
+            data_t = self.gen_bootstrap(data)
+            data_train, data_eval = self.split_train_test(data_t)
+            if self.tester == 'Neural':
+                batch_size = 512 if self.metric == 'donsker_varadhan' else 128
+                neurMINE = Neural_MINE(data_train, data_eval, self.dim_x,
+                                       metric=self.metric, batch_size=batch_size)
+                I_t, _ = neurMINE.train()
+            elif self.tester == 'Classifier':
+                classMINE = Classifier_MI(data_train, data_eval, self.dim_x,
+                                          h_dim=self.h_dim, max_ep=self.max_ep)
+                I_t = classMINE.train_classifier_MLP()
+            else:
+                raise NotImplementedError
+            I_list.append(I_t)
+        mi_est = np.mean(I_list)
+        return mi_est
+
     def is_indp(self, cmi_est):
-          if max(0, cmi_est) < self.threshold:
-              return True
-          else:
-              return False
-
-
-
-
+        if max(0, cmi_est) < self.threshold:
+            return True
+        else:
+            return False
