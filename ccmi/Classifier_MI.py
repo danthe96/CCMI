@@ -110,7 +110,7 @@ class Classifier_MI(object):
                     eval_inp = np.vstack((eval_inp_p, eval_inp_q))
                     eval_y = np.vstack((np.ones((B, 1)), np.zeros((B, 1))))
                     eval_acc = sess.run(accuracy, feed_dict={Inp: eval_inp, label: eval_y})
-                    print('Iteraion = {}, Test accuracy = {}'.format(it+1, eval_acc))
+                    # print('Iteraion = {}, Test accuracy = {}'.format(it+1, eval_acc))
 
             pos_label_pred_p = sess.run(y_prob, feed_dict={Inp: eval_inp_p})
             rn_est_p = (pos_label_pred_p+self.eps)/(1-pos_label_pred_p-self.eps)

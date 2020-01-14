@@ -433,7 +433,7 @@ def CCIT(X, Y, Z, max_depths=(6, 10, 13), n_estimators=(100, 200, 300), colsampl
      '''
 
     if Z is None:
-        print('Reverting Back to Independence Testing')
+        # print('Reverting Back to Independence Testing')
         assert (type(X) == np.ndarray), "Not an array"
         assert (type(Y) == np.ndarray), "Not an array"
         nx, dx = X.shape

@@ -38,7 +38,7 @@ class CCMI(object):
         return data_new
 
     def get_cmi_est(self):
-        print('Tester = {}, metric = {}'.format(self.tester, self.metric))
+        # print('Tester = {}, metric = {}'.format(self.tester, self.metric))
         I_xyz = self.get_mi_est(self.data_xyz)
         I_xz = self.get_mi_est(self.data_xz)
 
